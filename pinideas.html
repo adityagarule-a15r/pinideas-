@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinIdeas - Discover & Save Inspiration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #333;
+        }
+
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e60023;
+            text-decoration: none;
+        }
+
+        .search-box {
+            flex: 1;
+            max-width: 400px;
+            margin: 0 2rem;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: #e60023;
+            box-shadow: 0 0 0 3px rgba(230,0,35,0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #e60023;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #cc0020;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background: #f5f5f5;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            color: #222;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .pin {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .pin:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        .pin-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .pin-content {
+            padding: 1rem;
+        }
+
+        .pin-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .pin-source {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .pin-stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .save-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            opacity: 0;
+        }
+
+        .pin:hover .save-btn {
+            opacity: 1;
+        }
+
+        .save-btn:hover {
+            background: #e60023;
+            color: white;
+        }
+
+        .save-btn.saved {
+            background: #e60023;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-box {
+                margin: 0;
+                order: 3;
+            }
+
+            .header-buttons {
+                order: 2;
+            }
+
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">🅿️ PinIdeas</a>
+            <div class="search-box">
+                <svg class="search-icon" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+                <input type="text" class="search-input" placeholder="Search ideas...">
+            </div>
+            <div class="header-buttons">
+                <a href="#" class="btn btn-secondary">Home</a>
+                <a href="#" class="btn btn-primary">Save</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">Ideas for you</h1>
+        <div class="grid" id="pinGrid">
+            <!-- Pins will be populated by JavaScript -->
+        </div>
+    </main>
+
+    <div class="modal" id="pinModal">
+        <div class="modal-content">
+            <button class="close-btn" id="closeModal">&times;</button>
+            <img class="modal-image" id="modalImage" src="" alt="">
+            <div class="modal-body">
+                <h2 id="modalTitle"></h2>
+                <p id="modalDescription"></p>
+                <div style="margin-top: 1rem;">
+                    <button class="btn btn-primary" style="margin-right: 1rem;">Save to Board</button>
+                    <button class="btn btn-secondary">Share</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pins = [
+            {
+                id: 1,
+                image: 'https://images.unsplash.com/photo-1558618047-3c8c76bbb17e?w=400&h=500&fit=crop',
+                title: 'Minimalist Home Office Setup',
+                source: 'designinspo.com',
+                description: 'Create a clean, productive workspace with neutral tones and essential organization.',
+                saves: 1247
+            },
+            {
+                id: 2,
+                image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop',
+                title: 'Cozy Reading Nook Ideas',
+                source: 'homedecor.com',
+                description: 'Transform any corner into your perfect reading retreat with these cozy ideas.',
+                saves: 2893
+            },
+            {
+                id: 3,
+                image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=500&fit=crop',
+                title: 'Modern Kitchen Remodel',
+                source: 'kitchenlove.com',
+                description: 'Sleek designs and smart storage solutions for contemporary cooking spaces.',
+                saves: 4567
+            },
+            {
+                id: 4,
+                image: 'https://images.unsplash.com/photo-1524758631624-e2822f60598e?w=400&h=500&fit=crop',
+                title: 'Balcony Garden Inspiration',
+                source: 'urbanjungle.com',
+                description: 'Small space gardening tips and vertical planters for city dwellers.',
+                saves: 3421
+            },
+            {
+                id: 5,
+                image: 'https://images.unsplash.com/photo-1600210492493-0946911123ea?w=400&h=500&fit=crop',
+                title: 'Scandinavian Bedroom Decor',
+                source: 'nordicstyle.com',
+                description: 'Soft lighting, natural materials, and cozy textures for restful sleep.',
+                saves: 5123
+            },
+            {
+                id: 6,
+                image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3133?w=400&h=500&fit=crop',
+                title: 'DIY Wall Art Projects',
+                source: 'craftymind.com',
+                description: 'Easy, budget-friendly art ideas to personalize your living space.',
+                saves: 2789
+            },
+            {
+                id: 7,
+                image: 'https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=400&h=500&fit=crop',
+                title: 'Sustainable Fashion Outfits',
+                source: 'ecofashion.com',
+                description: 'Thrifted looks and ethical styling for conscious wardrobes.',
+                saves: 1890
+            },
+            {
+                id: 8,
+                image: 'https://images.unsplash.com/photo-1547503638-746d6b0ea9ec?w=400&h=500&fit=crop',
+                title: 'Workout Space at Home',
+                source: 'fitlife.com',
+                description: 'Compact home gym setups for effective daily exercise routines.',
+                saves: 3345
+            }
+        ];
+
+        const pinGrid = document.getElementById('pinGrid');
+        const modal = document.getElementById('pinModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const closeModal = document.getElementById('closeModal');
+
+        function createPin(pin) {
+            const pinElement = document.createElement('div');
+            pinElement.className = 'pin';
+            pinElement.innerHTML = `
+                <img class="pin-image" src="${pin.image}" alt="${pin.title}" loading="lazy">
+                <button class="save-btn" data-id="${pin.id}">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17 3H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7V5h10v14z"/>
+                    </svg>
+                </button>
+                <div class="pin-content">
+                    <div class="pin-title">${pin.title}</div>
+                    <div class="pin-source">${pin.source}</div>
+                    <div class="pin-stats">
+                        <span>${pin.saves} saves</span>
+                    </div>
+                </div>
+            `;
+            
+            pinElement.addEventListener('click', (e) => {
+                if (e.target.closest('.save-btn')) return;
+                openModal(pin);
+            });
+
+            const saveBtn = pinElement.querySelector('.save-btn');
+            saveBtn.addEventListener('click', () => toggleSave(saveBtn));
+
+            return pinElement;
+        }
+
+        function renderPins() {
+            pinGrid.innerHTML = '';
+            pins.forEach(pin => {
+                pinGrid.appendChild(createPin(pin));
+            });
+        }
+
+        function toggleSave(btn) {
+            const pinId = parseInt(btn.dataset.id);
+            btn.classList.toggle('saved');
+            
+            const pin = pins.find(p => p.id === pinId);
+            if (btn.classList.contains('saved')) {
+                pin.saves += 1;
+            } else {
+                pin.saves -= 1;
+            }
+            
+            // Update stats display
+            const stats = btn.closest('.pin').querySelector('.pin-stats span');
+            stats.textContent = `${pin.saves} saves`;
+        }
+
+        function openModal(pin) {
+            modalImage.src = pin.image;
+            modalTitle.textContent = pin.title;
+            modalDescription.textContent = pin.description;
+            modal.style.display = 'flex';
+        }
+
+        function closeModalHandler() {
+            modal.style.display = 'none';
+        }
+
+        // Event listeners
+        closeModal.addEventListener('click', closeModalHandler);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModalHandler();
+        });
+
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filteredPins = pins.filter(pin => 
+                pin.title.toLowerCase().includes(query) || 
+                pin.source.toLowerCase().includes(query)
+            );
+            pinGrid.innerHTML = '';
+            filteredPins.forEach(pin => {
+                pinGrid.appendChild(createPin(pin));
+            });
+        });
+
+        // Initialize
+        renderPins();
+    </script>
+</body>
+</html>
